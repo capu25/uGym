@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Alert, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
 const TrainingScreen = () => {
   const [userData, setUserData] = useState({ name: '' });
   const [exercises, setExercises] = useState([]); // Stato per memorizzare gli esercizi
+
+  const getCurrentDay = () => {
+    const dayIndex = new Date().getDay(); // Ottiene l'indice del giorno corrente (0 = Domenica, 1 = Lunedì, ...)
+    const dayNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+    
+    const currentDay = dayNames[dayIndex]; // Ottiene il nome del giorno corrispondente
+    return currentDay; // Restituisce il nome del giorno
+  };
 
   const loadUserData = async () => {
     try {
@@ -31,36 +39,30 @@ const TrainingScreen = () => {
     }, [])
   );
 
-  const handleDeleteData = async () => {
-    try {
-      await AsyncStorage.clear(); // Cancella tutti i dati in AsyncStorage
-      setUserData({ name: '' }); // Resetta lo stato locale
-      setExercises([]); // Resetta la lista degli esercizi
-      Alert.alert('Successo', 'Tutti i dati sono stati eliminati.');
-    } catch (error) {
-      console.log('Errore nella cancellazione dei dati', error);
-      Alert.alert('Errore', 'Impossibile eliminare i dati.');
-    }
-  };
-
   const renderExercise = ({ item }) => (
     <View style={styles.exerciseItem}>
-      <Text style={styles.exerciseName}>Esercizio: {item.name}</Text>
-      <Text>Serie: {item.series}</Text>
-      <Text>Peso: {item.weight} kg</Text>
-      <Text>Giorni: {item.selectedDays.join(', ')}</Text>
+      <Text style={styles.exerciseName}>{item.name}</Text>
+      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
+        <Text style={{fontSize: 18, fontWeight: '300'}}>Serie: {item.series}</Text>
+        <Text style={{fontSize: 18, fontWeight: '300',}}>Peso: {item.weight} kg</Text>
+        <Text style={{fontSize: 18, fontWeight: '300'}}>Giorno: {item.selectedDays.join(', ')}</Text>
+        <View style={{ bottom: 25}}>
+          <TouchableOpacity onPress={ () => {{color: 'green'}}}>
+            <Text>X</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        {userData.name ? (
-          <Text style={styles.welcomeText}>Welcome, {userData.name}!</Text>
-        ) : (
-          <Text style={styles.loadingText}>Loading user data...</Text>
-        )}
 
+      <View>
+        <Text>Allenamento del: {getCurrentDay()}</Text>
+      </View>
+
+      <View style={styles.content}>
         {exercises.length > 0 ? (
           <FlatList
             data={exercises}
@@ -70,8 +72,6 @@ const TrainingScreen = () => {
         ) : (
           <Text style={styles.noExercisesText}>Non ci sono esercizi aggiunti.</Text>
         )}
-
-        <Button title="Elimina tutti i dati" onPress={handleDeleteData} />
       </View>
     </View>
   );
@@ -90,17 +90,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '90%',
   },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  loadingText: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   noExercisesText: {
     fontSize: 18,
     textAlign: 'center',
@@ -108,7 +97,7 @@ const styles = StyleSheet.create({
   },
   exerciseItem: {
     backgroundColor: '#f0f0f0',
-    padding: 15,
+    padding: 12,
     borderRadius: 10,
     marginBottom: 15,
   },

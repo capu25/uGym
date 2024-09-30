@@ -82,6 +82,7 @@ const EmptyDataScreen = ({ navigation }) => {
         text1: 'Attenzione!',
         text2: 'Non hai aggiunto nessun esercizio.'
       });
+      Vibration.vibrate();
     }
   };
 

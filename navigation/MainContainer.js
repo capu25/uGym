@@ -10,6 +10,7 @@ import EmptyDataScreen from './screens/EmptyDataScreen';
 import TrainingScreen from './screens/TrainingScreen';
 import Settings from './screens/Settings';
 import OnboardingScreen from './screens/OnboardingScreen';
+import TimerScreen from './screens/TimerScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,15 +24,17 @@ const MainTabNavigator = () => {
         tabBarActiveTintColor: '#edd136',
         tabBarInactiveTintColor: '#a6a6a6',
         tabBarLabelStyle: {
-          fontSize: 15,
+          fontSize: 12,
           textAlign: 'center',
-          bottom: 10
+          bottom: 5
         },
         tabBarStyle : {
           backgroundColor: "#09090b",
-          borderTopRightRadius: 30,
-          borderTopLeftRadius: 30,
-          height: 120
+          //borderTopRightRadius: 25,
+          //borderTopLeftRadius: 25,
+          borderTopColor: '#edd136',
+          borderTopWidth: 2,
+          height: 95
         }
       }}
     >
@@ -40,7 +43,16 @@ const MainTabNavigator = () => {
         component={TrainingScreen} 
         options={{
           tabBarIcon: ({ color }) => (
-            <Icon name="user" size={40} color={color} style={{}}/>
+            <Icon name="user-circle-o" size={30} color={color} style={{}}/>
+          ),
+        }} 
+      />
+      <Tab.Screen 
+        name="Timer" 
+        component={TimerScreen} 
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Icon name="clock-o" size={33} color={color} style={{}}/> //clock-o
           ),
         }} 
       />
@@ -49,7 +61,7 @@ const MainTabNavigator = () => {
         component={Settings} 
         options={{
           tabBarIcon: ({ color }) => (
-            <Icon name="cog" size={40} color={color} style={{}}/>
+            <Icon name="cog" size={30} color={color} style={{}}/>
           ),
         }} 
       />
