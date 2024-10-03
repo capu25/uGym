@@ -3,12 +3,17 @@ import { View, Text, Button, Alert, Modal, TouchableOpacity, FlatList, TextInput
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
-
 const Settings = () => {
-  const [exercises, setExercises] = useState([]); // Stato per gli esercizi
+  const [exercises, setExercises] = useState([]); // Stato per gli esercizi esistenti
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null); // Esercizio selezionato per modifica
   const [fieldToEdit, setFieldToEdit] = useState(null); // Campo da modificare ('weight' o 'series')
+
+  // Stato per il nuovo esercizio
+  const [newExerciseName, setNewExerciseName] = useState('');
+  const [newExerciseSeries, setNewExerciseSeries] = useState('');
+  const [newExerciseWeight, setNewExerciseWeight] = useState('');
+  const [newExerciseDay, setNewExerciseDay] = useState('');
 
   // Carica i dati salvati alla partenza
   useEffect(() => {
@@ -94,6 +99,28 @@ const Settings = () => {
     );
   };
 
+  // Funzione per aggiungere un nuovo esercizio
+  const handleAddNewExercise = () => {
+    if (!newExerciseName || !newExerciseSeries || !newExerciseWeight || !newExerciseDay) {
+      Alert.alert('Errore', 'Devi compilare tutti i campi per aggiungere un esercizio.');
+      return;
+    }
+
+    const newExercise = {
+      name: newExerciseName,
+      series: parseInt(newExerciseSeries),
+      weight: parseInt(newExerciseWeight),
+      day: newExerciseDay,
+    };
+
+    const updatedExercises = [...exercises, newExercise];
+    setExercises(updatedExercises);
+    setNewExerciseName(''); // Resetta i campi
+    setNewExerciseSeries('');
+    setNewExerciseWeight('');
+    setNewExerciseDay('');
+  };
+
   const renderExercise = ({ item }) => (
     <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ddd', flexDirection: 'row', justifyContent: 'space-between' }}>
       <Text>{item.name}</Text>
@@ -129,6 +156,38 @@ const Settings = () => {
           color="red"
           style={{ marginTop: 20 }}
         />
+      </View>
+
+      {/* Sezione per aggiungere un nuovo esercizio */}
+      <View style={{ marginTop: 30 }}>
+        <Text style={{ fontSize: 18 }}>Aggiungi nuovo esercizio:</Text>
+        <TextInput
+          placeholder="Nome esercizio"
+          value={newExerciseName}
+          onChangeText={setNewExerciseName}
+          style={{ borderWidth: 1, padding: 10, marginVertical: 10 }}
+        />
+        <TextInput
+          placeholder="Numero di serie"
+          value={newExerciseSeries}
+          onChangeText={setNewExerciseSeries}
+          keyboardType="numeric"
+          style={{ borderWidth: 1, padding: 10, marginVertical: 10 }}
+        />
+        <TextInput
+          placeholder="Peso (kg)"
+          value={newExerciseWeight}
+          onChangeText={setNewExerciseWeight}
+          keyboardType="numeric"
+          style={{ borderWidth: 1, padding: 10, marginVertical: 10 }}
+        />
+        <TextInput
+          placeholder="Giorno"
+          value={newExerciseDay}
+          onChangeText={setNewExerciseDay}
+          style={{ borderWidth: 1, padding: 10, marginVertical: 10 }}
+        />
+        <Button title="Aggiungi Esercizio" onPress={handleAddNewExercise} />
       </View>
 
       {/* Modale per modificare l'esercizio */}

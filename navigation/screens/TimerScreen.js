@@ -38,8 +38,8 @@ export default class App extends Component {
   state = {
     remainingSeconds: 5,
     isRunning: false,
-    selectedMinutes: "0",
-    selectedSeconds: "5"
+    selectedMinutes: "1",
+    selectedSeconds: "0"
   };
 
   interval = null;

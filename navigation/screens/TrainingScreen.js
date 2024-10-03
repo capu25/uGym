@@ -2,17 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const TrainingScreen = () => {
   const [userData, setUserData] = useState({ name: '' });
   const [exercises, setExercises] = useState([]); // Stato per memorizzare gli esercizi
 
+  const giorniDellaSettimana = {
+    Lun: 'Lunedì',
+    Mar: 'Martedì',
+    Mer: 'Mercoledì',
+    Gio: 'Giovedì',
+    Ven: 'Venerdì',
+    Sab: 'Sabato',
+    Dom: 'Domenica'
+  };
+
+  // Restituisce il giorno corrente in formato abbreviato
   const getCurrentDay = () => {
     const dayIndex = new Date().getDay(); // Ottiene l'indice del giorno corrente (0 = Domenica, 1 = Lunedì, ...)
-    const dayNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+    const dayNames = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
     
-    const currentDay = dayNames[dayIndex]; // Ottiene il nome del giorno corrispondente
-    return currentDay; // Restituisce il nome del giorno
+    const currentDay = dayNames[dayIndex]; // Ottiene il nome abbreviato del giorno corrispondente
+    
+    return currentDay;
   };
 
   const loadUserData = async () => {
@@ -26,7 +39,15 @@ const TrainingScreen = () => {
       // Carica gli esercizi
       const storedExercises = await AsyncStorage.getItem('exercises');
       if (storedExercises) {
-        setExercises(JSON.parse(storedExercises)); // Imposta gli esercizi nello stato
+        const allExercises = JSON.parse(storedExercises);
+
+        // Filtra gli esercizi per il giorno corrente
+        const currentDay = getCurrentDay();
+        const filteredExercises = allExercises.filter(exercise =>
+          exercise.selectedDays.includes(currentDay) // Controlla se il giorno corrente è tra i giorni selezionati
+        );
+
+        setExercises(filteredExercises); // Imposta gli esercizi filtrati nello stato
       }
     } catch (error) {
       console.log('Errore nel caricamento dei dati', error);
@@ -42,15 +63,10 @@ const TrainingScreen = () => {
   const renderExercise = ({ item }) => (
     <View style={styles.exerciseItem}>
       <Text style={styles.exerciseName}>{item.name}</Text>
-      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
+      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginTop: 5}}>
         <Text style={{fontSize: 18, fontWeight: '300'}}>Serie: {item.series}</Text>
         <Text style={{fontSize: 18, fontWeight: '300',}}>Peso: {item.weight} kg</Text>
-        <Text style={{fontSize: 18, fontWeight: '300'}}>Giorno: {item.selectedDays.join(', ')}</Text>
-        <View style={{ bottom: 25}}>
-          <TouchableOpacity onPress={ () => {{color: 'green'}}}>
-            <Text>X</Text>
-          </TouchableOpacity>
-        </View>
+        {/*<Text style={{fontSize: 18, fontWeight: '300'}}>Giorno: {item.selectedDays.join(', ')}</Text>*/}
       </View>
     </View>
   );
@@ -58,21 +74,28 @@ const TrainingScreen = () => {
   return (
     <View style={styles.container}>
 
-      <View>
-        <Text>Allenamento del: {getCurrentDay()}</Text>
+      <View style={styles.headerTextBox}>
+        <Text style={styles.headerText}>
+          Allenamento del <Text style={{ color: '#edd136' }}>
+            {giorniDellaSettimana[getCurrentDay()] || ''}
+          </Text>
+        </Text>
       </View>
 
-      <View style={styles.content}>
-        {exercises.length > 0 ? (
-          <FlatList
-            data={exercises}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={renderExercise}
-          />
-        ) : (
-          <Text style={styles.noExercisesText}>Non ci sono esercizi aggiunti.</Text>
-        )}
+      <View style={styles.contentContaine}>
+        <View style={styles.content}>
+          {exercises.length > 0 ? (
+            <FlatList
+              data={exercises}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={renderExercise}
+            />
+          ) : (
+            <Text style={styles.noExercisesText}>Non ci sono esercizi per oggi.</Text>
+          )}
+        </View>
       </View>
+
     </View>
   );
 };
@@ -80,15 +103,33 @@ const TrainingScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    //justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
+    backgroundColor: '#09090b'
+  },
+  headerTextBox:{
+    marginTop: 70,
+    marginBottom: 20
+  },
+  headerText: {
+    fontSize: 30,
+    fontWeight: '400',
+    color: '#fff'
+  },
+  contentContaine:{
+    width: '100%',
+    height:'100%',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30
   },
   content: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    width: '90%',
+    width: '95%',
+    top: 10
   },
   noExercisesText: {
     fontSize: 18,
