@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Dimensions, Vibration, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Dimensions, Vibration, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
@@ -9,16 +9,15 @@ const EmptyDataScreen = ({ navigation }) => {
 
   const screenWidth = Dimensions.get('window').width;
 
-  // Stato per il nome, i giorni selezionati, le serie, e il peso
   const [name, setName] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
   const [series, setSeries] = useState(0);
   const [weight, setWeight] = useState(0);
-  const [exercises, setExercises] = useState([]); // Stato per memorizzare tutti gli esercizi
+  const [recovery, setRecovery] = useState('');
+  const [exercises, setExercises] = useState([]);
 
   const days = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
 
-  // Funzione per gestire la selezione dei giorni
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
       setSelectedDays(selectedDays.filter(d => d !== day));
@@ -27,25 +26,16 @@ const EmptyDataScreen = ({ navigation }) => {
     }
   };
 
-  // Funzione per aggiungere l'esercizio
   const handleAddExercise = async () => {
-    if (name.trim()) {
-      // Crea un nuovo esercizio
-      const newExercise = { name, selectedDays, series, weight };
-
-      // Aggiungi l'esercizio alla lista
+    if (name.trim() && recovery.trim()) { 
+      const newExercise = { name, selectedDays, series, weight, recovery }; 
       setExercises([...exercises, newExercise]);
-
-      // Salva l'elenco aggiornato degli esercizi in AsyncStorage
       await AsyncStorage.setItem('exercises', JSON.stringify([...exercises, newExercise]));
-
-      // Svuota i campi
       setName('');
       setSelectedDays([]);
       setSeries(0);
       setWeight(0);
-
-      // Mostra il toast di successo
+      setRecovery('');
       Toast.show({
         type: 'success',
         text1: 'Ben fatto!',
@@ -55,7 +45,7 @@ const EmptyDataScreen = ({ navigation }) => {
       Toast.show({
         type: 'error',
         text1: 'Attenzione!',
-        text2: 'Non hai inserito un esercizio valido.'
+        text2: 'Non hai inserito un esercizio valido o il recupero.'
       });
       Vibration.vibrate();
     }
@@ -65,16 +55,10 @@ const EmptyDataScreen = ({ navigation }) => {
     Alert.alert("Serie e Peso", "Gli esercizi con modalità 'PIRAMIDALE' o 'DROPSET' possono essere impostati in seguito.");
   }
 
-  // Funzione per salvare i dati e navigare alla schermata principale
   const handleSaveData = async () => {
     if (exercises.length > 0) {
-      // Salva l'elenco finale degli esercizi in AsyncStorage
       await AsyncStorage.setItem('exercises', JSON.stringify(exercises));
-
-      // Imposta il flag dei dati completati
       await AsyncStorage.setItem('hasCompletedData', 'true');
-
-      // Naviga alla schermata principale
       navigation.replace('MainTabs');
     } else {
       Toast.show({
@@ -86,7 +70,6 @@ const EmptyDataScreen = ({ navigation }) => {
     }
   };
 
-  // Componente per i pulsanti dei giorni
   const DayButton = ({ day, isSelected, onPress }) => {
     return (
       <TouchableOpacity
@@ -99,119 +82,130 @@ const EmptyDataScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.logo}>
-        <Image
-          source={require('../../assets/ugymLogo.png')}  
-          style={styles.image} 
-          resizeMode="contain"
-        />
-      </View>
-      <View style={[styles.whiteContainer, { width: screenWidth }]}>
-        
-        <Text style={styles.headerText}>Inserisci gli esercizi presenti nella scheda!</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="Nome esercizio"
-          style={styles.inputBox}
-        />
-
-        <View style={styles.counters}>
-          {/* Serie */}
-          <Counter
-            start={series}
-            max={20}
-            onChange={(count) => setSeries(count)}
-            buttonStyle={{
-              borderColor: '#333',
-              borderWidth: 2,
-              height: 50,
-              width: 50,
-            }}
-            buttonTextStyle={{
-              color: '#edd166',
-              fontSize: 40,
-              fontWeight: 300,
-              bottom: 3
-            }}
-            countTextStyle={{
-              color: '#333',
-              fontSize: 20,
-              fontWeight: 'bold'
-            }}
-          />
-          {/* Peso */}
-          <Counter
-            start={weight}
-            max={200}
-            increment={5}
-            onChange={(count) => setWeight(count)}
-            buttonStyle={{
-              borderColor: '#333',
-              borderWidth: 2,
-              height: 50,
-              width: 50,
-            }}
-            buttonTextStyle={{
-              color: '#edd166',
-              fontSize: 40,
-              fontWeight: 300,
-              bottom: 3
-            }}
-            countTextStyle={{
-              color: '#333',
-              fontSize: 20,
-              fontWeight: 'bold'
-            }}
-          />
-        </View>
-
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around', bottom: 20, width: 280, left: 10 }}>
-          <Text style={{ fontSize: 16, fontWeight: '500' }}>N° Serie</Text>
-          <TouchableOpacity onPress={handleInfo} style={{ borderWidth:1, borderColor:'#edd166',borderRadius: 50, width: 20, alignItems: 'center'}}><Text style={{ fontSize: 16, fontWeight: '400'}}>i</Text></TouchableOpacity>
-          <Text style={{ fontSize: 16, fontWeight: '500' }}>Peso (KGs)</Text>
-        </View>
-
-        <Text style={styles.headerTextII}>Seleziona anche a quale giorno appartengono.</Text>
-
-        <View style={styles.dayContainer}>
-          {days.map((day, index) => (
-            <DayButton
-              key={index}
-              day={day}
-              isSelected={selectedDays.includes(day)} 
-              onPress={() => toggleDay(day)}         
-            />
-          ))}
-        </View>
-
-        <View style={styles.addText}>
+    // Avvolgi tutto in un TouchableWithoutFeedback per far collassare la tastiera quando si tocca fuori
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <View style={styles.logo}>
           <Image
-            source={require('../../assets/add.png')}  
-            style={{ height: 40, width: 60 }} 
+            source={require('../../assets/ugymLogo.png')}
+            style={styles.image}
             resizeMode="contain"
           />
         </View>
+        <View style={[styles.whiteContainer, { width: screenWidth }]}>
+          <Text style={styles.headerText}>Inserisci gli esercizi presenti nella scheda!</Text>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="Nome esercizio"
+            style={styles.inputBox}
+            onSubmitEditing={Keyboard.dismiss} // Nascondi la tastiera al termine dell'inserimento
+          />
 
-        <View style={styles.buttonContainer}>
-          {/* Bottone "Ho finito!" */}
-          <TouchableOpacity style={styles.finishedButton} onPress={handleSaveData}>
-            <Text style={styles.finishedButtonText}>Ho finito!</Text>
-          </TouchableOpacity>
-
-          {/* Bottone "Aggiungi" */}
-          <View style={styles.addButtonContainer}>
-            <TouchableOpacity style={styles.addButton} onPress={handleAddExercise}>
-              <AntDesign name="plus" size={24} color="white" />
-            </TouchableOpacity>
+          <View style={styles.counters}>
+            <Counter
+              start={series}
+              max={20}
+              onChange={(count) => setSeries(count)}
+              buttonStyle={{
+                borderColor: '#333',
+                borderWidth: 2,
+                height: 50,
+                width: 50,
+              }}
+              buttonTextStyle={{
+                color: '#edd166',
+                fontSize: 40,
+                fontWeight: 300,
+                bottom: 3
+              }}
+              countTextStyle={{
+                color: '#333',
+                fontSize: 20,
+                fontWeight: 'bold'
+              }}
+            />
+            <Counter
+              start={weight}
+              max={200}
+              increment={5}
+              onChange={(count) => setWeight(count)}
+              buttonStyle={{
+                borderColor: '#333',
+                borderWidth: 2,
+                height: 50,
+                width: 50,
+              }}
+              buttonTextStyle={{
+                color: '#edd166',
+                fontSize: 40,
+                fontWeight: 300,
+                bottom: 3
+              }}
+              countTextStyle={{
+                color: '#333',
+                fontSize: 20,
+                fontWeight: 'bold'
+              }}
+            />
           </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', bottom: 20, width: 280, left: 10 }}>
+            <Text style={{ fontSize: 16, fontWeight: '500' }}>N° Serie</Text>
+            <TouchableOpacity onPress={handleInfo} style={{ borderWidth: 1, borderColor: '#edd166', borderRadius: 50, width: 20, alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, fontWeight: '400' }}>i</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 16, fontWeight: '500' }}>Peso (KGs)</Text>
+          </View>
+
+          {/* Campo per il recupero */}
+          <TextInput
+            value={recovery}
+            onChangeText={setRecovery}
+            placeholder="Recupero (in secondi)"
+            style={styles.inputBoxII}
+            keyboardType="numeric"
+            onSubmitEditing={Keyboard.dismiss} // Nascondi la tastiera al termine dell'inserimento
+          />
+
+          <Text style={styles.headerTextII}>Seleziona a quale giorno appartiene.</Text>
+
+          <View style={styles.dayContainer}>
+            {days.map((day, index) => (
+              <DayButton
+                key={index}
+                day={day}
+                isSelected={selectedDays.includes(day)}
+                onPress={() => toggleDay(day)}
+              />
+            ))}
+          </View>
+
+          <View style={styles.addText}>
+            <Image
+              source={require('../../assets/add.png')}
+              style={{ height: 40, width: 60 }}
+              resizeMode="contain"
+            />
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.finishedButton} onPress={handleSaveData}>
+              <Text style={styles.finishedButtonText}>Ho finito!</Text>
+            </TouchableOpacity>
+
+            <View style={styles.addButtonContainer}>
+              <TouchableOpacity style={styles.addButton} onPress={handleAddExercise}>
+                <AntDesign name="plus" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
         </View>
 
+        <Toast text1Style={{ fontSize: 15 }} text2Style={{ fontSize: 15 }} />
       </View>
-
-      <Toast text1Style={{ fontSize: 15 }} text2Style={{ fontSize: 15 }} />
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -258,6 +252,13 @@ const styles = StyleSheet.create({
     width: 350,
     height: 50,
     borderRadius: 25,
+  },
+  inputBoxII:{
+    borderWidth: 2,
+    padding: 5,
+    borderRadius: 20,
+    borderColor: '#000',
+    width: 156
   },
   // COUNTERS
   counters: {
