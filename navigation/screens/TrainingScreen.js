@@ -142,10 +142,10 @@ const TrainingScreen = () => {
                 <Text style={{textAlign: 'center', fontSize: 25, fontWeight: '300'}}><Text style={{color:'#edd136', fontWeight: 500}}>Ben fatto</Text>, ricarica le batterie!</Text>
               </View>
               <LottieView
-                source={require('../../assets/lottie/animation.json')}
+                source={require('../../assets/lottie/animationII.json')}
                 autoPlay
                 loop
-                style={{width:'100%', height:'100%', bottom: 100}}
+                style={{width:'100%', height:'100%', bottom: 70}}
               />
             </View>
           )}

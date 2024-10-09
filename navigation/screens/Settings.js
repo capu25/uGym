@@ -86,13 +86,13 @@ const Settings = () => {
           ListEmptyComponent={<View style={{alignItems: 'center', marginTop: '60%'}}>
                                 <Text style={{fontSize: 25, textAlign: 'center', marginBottom: 20}}>OOPS... qualcosa non va!</Text>
                                 <Text style={{fontSize: 25, textAlign: 'center'}}>Nessun esercizio disponibile.</Text>
-                                <Text style={{fontSize: 18, textAlign: 'center', marginTop: 20}}>Per inserire nuovi esercizi, premi <Text style={{color:'red'}}>"ELIMINA TUTTI I DATI"</Text> e segui la procedura indicata.</Text>
+                                <Text style={{fontSize: 18, textAlign: 'center', marginTop: 20}}>Per inserire nuovi esercizi, premi <Text style={{color:'red'}}>"INSERISCI NUOVA SCHEDA"</Text> e segui la procedura indicata.</Text>
                               </View>} // Componente vuoto da visualizzare quando non ci sono esercizi
         />
 
         {/* Pulsante per eliminare tutti i dati */}
         <Button
-          title="Elimina Tutti i Dati"
+          title="Inserisci Nuova Scheda"
           onPress={handleClearAllData}
           color="red"
           style={{ marginTop: 20 }}

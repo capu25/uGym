@@ -28,16 +28,16 @@ const EmptyDataScreen = ({ navigation }) => {
   };
 
   const handleAddExercise = async () => {
-    if (name.trim() && recovery > 0 && reps > 0 && weight > 0 && series > 0) { 
+    if (name.trim() && recovery > 0 && reps > 0  && series > 0) { 
       const newExercise = { name, selectedDays, series, reps, weight, recovery }; 
       setExercises([...exercises, newExercise]);
       await AsyncStorage.setItem('exercises', JSON.stringify([...exercises, newExercise]));
       setName('');
       setSelectedDays([]);
-      setSeries(0);
-      setReps(0);
-      setWeight(0);
-      setRecovery(0);
+      //setSeries(0);
+      //setReps(0);
+      //setWeight(0);
+      //setRecovery(0);
       Toast.show({
         type: 'success',
         text1: 'Ben fatto!',
