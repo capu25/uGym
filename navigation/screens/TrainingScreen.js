@@ -105,7 +105,7 @@ const TrainingScreen = () => {
               ))}
             </View>
           ) : (
-            <Text style={{ fontSize: 18, fontWeight: '500' }}>Peso: {item.weight} Kg</Text>
+            <Text style={{ fontSize: 18, fontWeight: '300', marginTop: 10 }}>Peso: {item.weight} Kg</Text>
           )}
         </View>
         <Text style={{ fontSize: 18, fontWeight: '500' }}>Recupero: {item.recovery}''</Text>
