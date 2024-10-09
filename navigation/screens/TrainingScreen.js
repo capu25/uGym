@@ -95,7 +95,8 @@ const TrainingScreen = () => {
       <Text style={styles.exerciseName}>{item.name}</Text>
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginTop: 5, padding: 10 }}>
         <View>
-          <Text style={{ fontSize: 18, fontWeight: '500' }}>Serie: {item.series}</Text>
+          <Text style={{ fontSize: 18, fontWeight: '500' }}>Serie: {item.series} x |{item.reps} rep|</Text>
+
           {item.useMultipleWeights ? (
             <View style={{marginTop: 10}}>
               {item.weights.map((weight, index) => (

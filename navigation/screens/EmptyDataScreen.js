@@ -11,9 +11,10 @@ const EmptyDataScreen = ({ navigation }) => {
 
   const [name, setName] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
-  const [series, setSeries] = useState(0);
-  const [weight, setWeight] = useState(0);
-  const [recovery, setRecovery] = useState('');
+  const [series, setSeries] = useState(0);   // Numero di serie
+  const [reps, setReps] = useState(0);       // Numero di ripetizioni per serie
+  const [weight, setWeight] = useState(0);   // Peso in KG
+  const [recovery, setRecovery] = useState(0); // Recupero in secondi
   const [exercises, setExercises] = useState([]);
 
   const days = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
@@ -27,15 +28,16 @@ const EmptyDataScreen = ({ navigation }) => {
   };
 
   const handleAddExercise = async () => {
-    if (name.trim() && recovery.trim()) { 
-      const newExercise = { name, selectedDays, series, weight, recovery }; 
+    if (name.trim() && recovery > 0 && reps > 0 && weight > 0 && series > 0) { 
+      const newExercise = { name, selectedDays, series, reps, weight, recovery }; 
       setExercises([...exercises, newExercise]);
       await AsyncStorage.setItem('exercises', JSON.stringify([...exercises, newExercise]));
       setName('');
       setSelectedDays([]);
       setSeries(0);
+      setReps(0);
       setWeight(0);
-      setRecovery('');
+      setRecovery(0);
       Toast.show({
         type: 'success',
         text1: 'Ben fatto!',
@@ -51,8 +53,8 @@ const EmptyDataScreen = ({ navigation }) => {
     }
   };
 
-  const handleInfo = () => {
-    Alert.alert("Serie e Peso", "Gli esercizi con modalità 'PIRAMIDALE' possono essere impostati in seguito. Inserisci un peso 'base' se necessiti una modifica di fino.");
+  const handleInfo = () => { 
+    Alert.alert("Serie, Ripetizioni e Peso", "I valori inseriti sono modificabili nella pagina seguente per gli allenamenti 'Piramidali' o 'Dropset'");
   }
 
   const handleSaveData = async () => {
@@ -82,7 +84,6 @@ const EmptyDataScreen = ({ navigation }) => {
   };
 
   return (
-    // Avvolgi tutto in un TouchableWithoutFeedback per far collassare la tastiera quando si tocca fuori
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
         <View style={styles.logo}>
@@ -103,6 +104,7 @@ const EmptyDataScreen = ({ navigation }) => {
           />
 
           <View style={styles.counters}>
+            {/* Contatore per le serie */}
             <Counter
               start={series}
               max={20}
@@ -125,11 +127,12 @@ const EmptyDataScreen = ({ navigation }) => {
                 fontWeight: 'bold'
               }}
             />
+            {/* Contatore per le ripetizioni */}
             <Counter
-              start={weight}
-              max={200}
-              increment={5}
-              onChange={(count) => setWeight(count)}
+              start={reps}
+              max={50}
+              increment={2}
+              onChange={(count) => setReps(count)} // Contatore per ripetizioni
               buttonStyle={{
                 borderColor: '#333',
                 borderWidth: 2,
@@ -151,22 +154,68 @@ const EmptyDataScreen = ({ navigation }) => {
           </View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-around', bottom: 20, width: 280, left: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: '500' }}>N° Serie</Text>
-            <TouchableOpacity onPress={handleInfo} style={{ borderWidth: 1, borderColor: '#edd166', borderRadius: 50, width: 20, alignItems: 'center' }}>
+            <Text style={{ fontSize: 16, fontWeight: '500' }}>Serie</Text>
+            <TouchableOpacity onPress={handleInfo} style={{ borderWidth: 1, borderColor: '#edd166', borderRadius: 50, width: 20, alignItems: 'center', left: 10, top: 20 }}>
               <Text style={{ fontSize: 16, fontWeight: '400' }}>i</Text>
             </TouchableOpacity>
-            <Text style={{ fontSize: 16, fontWeight: '500' }}>Peso (KGs)</Text>
+            <Text style={{ fontSize: 16, fontWeight: '500' }}>Ripetizioni</Text>
           </View>
 
-          {/* Campo per il recupero */}
-          <TextInput
-            value={recovery}
-            onChangeText={setRecovery}
-            placeholder="Recupero (in secondi)"
-            style={styles.inputBoxII}
-            keyboardType="numeric"
-            onSubmitEditing={Keyboard.dismiss} // Nascondi la tastiera al termine dell'inserimento
-          />
+          <View style={styles.counters}>
+            {/* Contatore per il peso */}
+            <Counter
+              start={weight}
+              max={200}
+              increment={5}
+              onChange={(count) => setWeight(count)} // Peso in KG
+              buttonStyle={{
+                borderColor: '#333',
+                borderWidth: 2,
+                height: 50,
+                width: 50,
+              }}
+              buttonTextStyle={{
+                color: '#edd166',
+                fontSize: 40,
+                fontWeight: 300,
+                bottom: 3
+              }}
+              countTextStyle={{
+                color: '#333',
+                fontSize: 20,
+                fontWeight: 'bold'
+              }}
+            />
+            {/* Contatore per il recupero */}
+            <Counter
+              start={recovery}
+              max={300} // Max 5 minuti di recupero
+              increment={10}
+              onChange={(count) => setRecovery(count)} // Recupero in secondi
+              buttonStyle={{
+                borderColor: '#333',
+                borderWidth: 2,
+                height: 50,
+                width: 50,
+              }}
+              buttonTextStyle={{
+                color: '#edd166',
+                fontSize: 40,
+                fontWeight: 300,
+                bottom: 3
+              }}
+              countTextStyle={{
+                color: '#333',
+                fontSize: 20,
+                fontWeight: 'bold'
+              }}
+            />
+          </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', bottom: 20, width: 280 }}>
+            <Text style={{ fontSize: 16, fontWeight: '500', right: 10 }}>Peso (KGs)</Text>
+            <Text style={{ fontSize: 16, fontWeight: '500', left: 25 }}>Recupero (s)</Text>
+          </View>
 
           <Text style={styles.headerTextII}>Seleziona a quale giorno appartiene.</Text>
 
@@ -210,6 +259,7 @@ const EmptyDataScreen = ({ navigation }) => {
 };
 
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -218,7 +268,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#09090b',
   },
   logo: {
-    top: 30,
+    top: 20,
   },
   image: {
     width: 250,
@@ -232,7 +282,8 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     alignItems: 'center',
     padding: 30,
-    top: 50
+    top: 20,
+    height: 750
   },
   headerText: {
     fontSize: 30,
@@ -308,7 +359,8 @@ const styles = StyleSheet.create({
   // AGGIUNGI CURVO SU + 
   addText:{
     alignSelf: 'flex-end',
-    left: 5
+    left: 5,
+    bottom: 30
   },
   // BOTTONI A FINE PAGINA
   buttonContainer: {
@@ -316,7 +368,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    bottom: 20,
+    bottom: 50,
   },
   finishedButton: {
     backgroundColor: '#fff',
