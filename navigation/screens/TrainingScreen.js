@@ -97,11 +97,11 @@ const TrainingScreen = () => {
         <View>
           <Text style={{ fontSize: 18, fontWeight: '500' }}>Serie: {item.series}</Text>
           {item.useMultipleWeights ? (
-            <View>
+            <View style={{marginTop: 10}}>
               {item.weights.map((weight, index) => (
-                <Text key={index} style={{ fontSize: 18, fontWeight: '500' }}>
-                  Peso {index + 1}: {weight} Kg
-                </Text>
+                  <Text key={index} style={{ fontSize: 18, fontWeight: '300' }}>
+                    Peso {index + 1}ª serie: {weight} Kg
+                  </Text>
               ))}
             </View>
           ) : (
