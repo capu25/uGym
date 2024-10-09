@@ -9,13 +9,24 @@ const TrainingScreen = () => {
   const [exercises, setExercises] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
-  const [updatedExercise, setUpdatedExercise] = useState({ 
-    name: '', 
-    series: '', 
-    weight: '', 
+  //const [updatedExercise, setUpdatedExercise] = useState({ 
+  //  name: '', 
+  //  series: '', 
+  //  weight: '', 
+  //  weights: [''], // Lista di pesi multipli
+ //   recovery: '', 
+ //   useMultipleWeights: false // Switch per pesi multipli
+ // });
+
+  const [updatedExercise, setUpdatedExercise] = useState({
+    name: '',
+    series: '',
+    weight: '',
     weights: [''], // Lista di pesi multipli
-    recovery: '', 
-    useMultipleWeights: false // Switch per pesi multipli
+    reps: [''], // Lista di ripetizioni multiple
+    recovery: '',
+    useMultipleWeights: false, // Switch per pesi multipli
+    useMultipleReps: false // Switch per ripetizioni multiple
   });
 
   const giorniDellaSettimana = {
@@ -63,16 +74,23 @@ const TrainingScreen = () => {
 
   const openEditModal = (exercise) => {
     setSelectedExercise(exercise);
-    setUpdatedExercise({ ...exercise, weights: exercise.weights || [''], useMultipleWeights: exercise.useMultipleWeights || false });
+    setUpdatedExercise({
+      ...exercise,
+      weights: exercise.weights || [''],  // Assicura che 'weights' sia un array
+      reps: exercise.reps || [''],        // Assicura che 'reps' sia un array
+      useMultipleWeights: exercise.useMultipleWeights || false,
+      useMultipleReps: exercise.useMultipleReps || false
+    });
     setIsModalVisible(true);
   };
+  
 
   const handleSave = async () => {
     const updatedExercises = exercises.map(exercise => 
       exercise.name === selectedExercise.name ? updatedExercise : exercise
     );
     setExercises(updatedExercises);
-
+  
     // Salva in AsyncStorage
     try {
       const storedExercises = await AsyncStorage.getItem('exercises');
@@ -86,7 +104,7 @@ const TrainingScreen = () => {
     } catch (error) {
       console.log('Errore nel salvataggio dei dati', error);
     }
-
+  
     setIsModalVisible(false);
   };
 
@@ -95,14 +113,24 @@ const TrainingScreen = () => {
       <Text style={styles.exerciseName}>{item.name}</Text>
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginTop: 5, padding: 10 }}>
         <View>
-          <Text style={{ fontSize: 18, fontWeight: '500' }}>Serie: {item.series} x |{item.reps} rep|</Text>
-
+          <Text style={{ fontSize: 18, fontWeight: '500' }}>Serie: {item.series}</Text>
+  
+          {/* Gestione delle ripetizioni */}
+          {item.useMultipleReps ? (
+            <Text style={{ fontSize: 18, fontWeight: '300', marginTop: 10 }}>
+              Ripetizioni: {item.reps.join(', ')}
+            </Text>
+          ) : (
+            <Text style={{ fontSize: 18, fontWeight: '300', marginTop: 10 }}>Ripetizioni: {item.reps[0]}</Text>
+          )}
+  
+          {/* Gestione dei pesi */}
           {item.useMultipleWeights ? (
-            <View style={{marginTop: 10}}>
+            <View style={{ marginTop: 10 }}>
               {item.weights.map((weight, index) => (
-                  <Text key={index} style={{ fontSize: 18, fontWeight: '300' }}>
-                    Peso {index + 1}ª serie: {weight} Kg
-                  </Text>
+                <Text key={index} style={{ fontSize: 18, fontWeight: '300' }}>
+                  Peso {index + 1}ª serie: {weight} Kg
+                </Text>
               ))}
             </View>
           ) : (
@@ -115,7 +143,7 @@ const TrainingScreen = () => {
         <Text style={styles.editButtonText}>Modifica</Text>
       </TouchableOpacity>
     </View>
-  );
+  );  
 
   return (
     <View style={styles.container}>
@@ -161,23 +189,73 @@ const TrainingScreen = () => {
           >
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Modifica esercizio</Text>
-              
-              <TextInput
-                style={styles.input}
-                placeholder="Serie"
-                value={updatedExercise.series}
-                keyboardType="numeric"
-                onChangeText={text => setUpdatedExercise({ ...updatedExercise, series: text })}
-              />
 
-              <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10}}>
+              {/* Switch per abilitare ripetizioni multiple */}
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
                 <Switch
-                  value={updatedExercise.useMultipleWeights}
-                  onValueChange={(value) => setUpdatedExercise({ ...updatedExercise, useMultipleWeights: value })}
+                  value={updatedExercise.useMultipleReps}
+                  onValueChange={value => {
+                    // Se si abilita "useMultipleReps", converti reps in un array di ripetizioni per ogni serie
+                    if (value) {
+                      const newReps = Array.from({ length: parseInt(updatedExercise.series) || 1 }, () => updatedExercise.reps[0] || '');
+                      setUpdatedExercise({ ...updatedExercise, useMultipleReps: true, reps: newReps });
+                    } else {
+                      // Se si disabilita, convertilo in una singola stringa
+                      setUpdatedExercise({ ...updatedExercise, useMultipleReps: false, reps: [updatedExercise.reps[0] || ''] });
+                    }
+                  }}
                 />
-                <Text style={{left: 5, fontSize: 15, fontWeight: '200'}}>{updatedExercise.useMultipleWeights ? "Usa più pesi" : "Usa più pesi"}</Text>
+                <Text style={{ left: 5, fontSize: 15, fontWeight: '200' }}>
+                  {updatedExercise.useMultipleReps ? 'Piramidale' : 'Piramidale'}
+                </Text>
               </View>
 
+              {/* Input per le ripetizioni */}
+              {updatedExercise.useMultipleReps ? (
+                updatedExercise.reps.map((rep, index) => (
+                  <TextInput
+                    key={index}
+                    style={styles.input}
+                    placeholder={`Ripetizione ${index + 1}`}
+                    value={rep}
+                    keyboardType="numeric"
+                    onChangeText={text => {
+                      const newReps = [...updatedExercise.reps];
+                      newReps[index] = text;
+                      setUpdatedExercise({ ...updatedExercise, reps: newReps });
+                    }}
+                  />
+                ))
+              ) : (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ripetizioni"
+                  value={updatedExercise.reps[0]}
+                  keyboardType="numeric"
+                  onChangeText={text => setUpdatedExercise({ ...updatedExercise, reps: [text] })}
+                />
+              )}
+
+              {/* Bottone per aggiungere un'altra ripetizione */}
+              {updatedExercise.useMultipleReps && (
+                <Button
+                  title="Aggiungi un'altra ripetizione"
+                  onPress={() => setUpdatedExercise({ ...updatedExercise, reps: [...updatedExercise.reps, ''] })}
+                />
+              )}
+
+              {/* Switch per abilitare pesi multipli */}
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+                <Switch
+                  value={updatedExercise.useMultipleWeights}
+                  onValueChange={value => setUpdatedExercise({ ...updatedExercise, useMultipleWeights: value })}
+                />
+                <Text style={{ left: 5, fontSize: 15, fontWeight: '200' }}>
+                  {updatedExercise.useMultipleWeights ? 'Usa più pesi' : 'Usa peso singolo'}
+                </Text>
+              </View>
+
+              {/* Input per i pesi */}
               {updatedExercise.useMultipleWeights ? (
                 updatedExercise.weights.map((weight, index) => (
                   <TextInput
