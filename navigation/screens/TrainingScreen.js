@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput, Button, Switch, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import LottieView from 'lottie-react-native';
 
 const TrainingScreen = () => {
   const [userData, setUserData] = useState({ name: '' });
   const [exercises, setExercises] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
-  const [updatedExercise, setUpdatedExercise] = useState({ name: '', series: '', weight: '', recovery: '' });
+  const [updatedExercise, setUpdatedExercise] = useState({ 
+    name: '', 
+    series: '', 
+    weight: '', 
+    weights: [''], // Lista di pesi multipli
+    recovery: '', 
+    useMultipleWeights: false // Switch per pesi multipli
+  });
 
   const giorniDellaSettimana = {
     Lun: 'Lunedì',
@@ -56,12 +63,11 @@ const TrainingScreen = () => {
 
   const openEditModal = (exercise) => {
     setSelectedExercise(exercise);
-    setUpdatedExercise({ ...exercise });
+    setUpdatedExercise({ ...exercise, weights: exercise.weights || [''], useMultipleWeights: exercise.useMultipleWeights || false });
     setIsModalVisible(true);
   };
 
   const handleSave = async () => {
-    // Aggiorna l'esercizio nella lista
     const updatedExercises = exercises.map(exercise => 
       exercise.name === selectedExercise.name ? updatedExercise : exercise
     );
@@ -81,21 +87,29 @@ const TrainingScreen = () => {
       console.log('Errore nel salvataggio dei dati', error);
     }
 
-    // Chiudi la modale
     setIsModalVisible(false);
   };
 
   const renderExercise = ({ item }) => (
     <View style={styles.exerciseItem}>
       <Text style={styles.exerciseName}>{item.name}</Text>
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginTop: 5 }}>
-        <Text style={{ fontSize: 18, fontWeight: '300' }}>Serie: {item.series}</Text>
-        <Text style={{ fontSize: 18, fontWeight: '300' }}>Peso: {item.weight} kg</Text>
+      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginTop: 5, padding: 10 }}>
+        <View>
+          <Text style={{ fontSize: 18, fontWeight: '500' }}>Serie: {item.series}</Text>
+          {item.useMultipleWeights ? (
+            <View>
+              {item.weights.map((weight, index) => (
+                <Text key={index} style={{ fontSize: 18, fontWeight: '500' }}>
+                  Peso {index + 1}: {weight} Kg
+                </Text>
+              ))}
+            </View>
+          ) : (
+            <Text style={{ fontSize: 18, fontWeight: '500' }}>Peso: {item.weight} Kg</Text>
+          )}
+        </View>
+        <Text style={{ fontSize: 18, fontWeight: '500' }}>Recupero: {item.recovery}''</Text>
       </View>
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', marginTop: 5 }}>
-        <Text style={{ fontSize: 18, fontWeight: '300' }}>Recupero: {item.recovery} sec</Text>
-      </View>
-      {/* Bottone per modificare */}
       <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
         <Text style={styles.editButtonText}>Modifica</Text>
       </TouchableOpacity>
@@ -121,8 +135,17 @@ const TrainingScreen = () => {
               renderItem={renderExercise}
             />
           ) : (
-            <View style={{borderWidth: 1, borderColor: 'red'}}>
-              <Text style={styles.noExercisesText}>Non ci sono esercizi per oggi.</Text>
+            <View>
+              <View style={{top: 60}}>
+                <Text style={styles.noExercisesText}>Non ci sono esercizi per oggi.</Text>
+                <Text style={{textAlign: 'center', fontSize: 25, fontWeight: '300'}}><Text style={{color:'#edd136', fontWeight: 500}}>Ben fatto</Text>, ricarica le batterie!</Text>
+              </View>
+              <LottieView
+                source={require('../../assets/lottie/animation.json')}
+                autoPlay
+                loop
+                style={{width:'100%', height:'100%', bottom: 180}}
+              />
             </View>
           )}
         </View>
@@ -130,36 +153,76 @@ const TrainingScreen = () => {
 
       {/* Modale per modificare l'esercizio */}
       <Modal visible={isModalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Modifica esercizio</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Serie"
-              value={updatedExercise.series}
-              keyboardType="numeric"
-              onChangeText={text => setUpdatedExercise({ ...updatedExercise, series: text })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Peso (kg)"
-              value={updatedExercise.weight}
-              keyboardType="numeric"
-              onChangeText={text => setUpdatedExercise({ ...updatedExercise, weight: text })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Recupero (sec)"
-              value={updatedExercise.recovery}
-              keyboardType="numeric"
-              onChangeText={text => setUpdatedExercise({ ...updatedExercise, recovery: text })}
-            />
-            <Button title="Salva" onPress={handleSave} />
-            <Button title="Annulla" onPress={() => setIsModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.modalContainer}
+          >
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Modifica esercizio</Text>
+              
+              <TextInput
+                style={styles.input}
+                placeholder="Serie"
+                value={updatedExercise.series}
+                keyboardType="numeric"
+                onChangeText={text => setUpdatedExercise({ ...updatedExercise, series: text })}
+              />
 
+              <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10}}>
+                <Switch
+                  value={updatedExercise.useMultipleWeights}
+                  onValueChange={(value) => setUpdatedExercise({ ...updatedExercise, useMultipleWeights: value })}
+                />
+                <Text style={{left: 5, fontSize: 15, fontWeight: '200'}}>{updatedExercise.useMultipleWeights ? "Usa più pesi" : "Usa più pesi"}</Text>
+              </View>
+
+              {updatedExercise.useMultipleWeights ? (
+                updatedExercise.weights.map((weight, index) => (
+                  <TextInput
+                    key={index}
+                    style={styles.input}
+                    placeholder={`Peso ${index + 1} (kg)`}
+                    value={weight}
+                    keyboardType="numeric"
+                    onChangeText={text => {
+                      const newWeights = [...updatedExercise.weights];
+                      newWeights[index] = text;
+                      setUpdatedExercise({ ...updatedExercise, weights: newWeights });
+                    }}
+                  />
+                ))
+              ) : (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Peso (kg)"
+                  value={updatedExercise.weight}
+                  keyboardType="numeric"
+                  onChangeText={text => setUpdatedExercise({ ...updatedExercise, weight: text })}
+                />
+              )}
+
+              {updatedExercise.useMultipleWeights && (
+                <Button
+                  title="Aggiungi un altro peso"
+                  onPress={() => setUpdatedExercise({ ...updatedExercise, weights: [...updatedExercise.weights, ''] })}
+                />
+              )}
+
+              <TextInput
+                style={styles.input}
+                placeholder="Recupero (sec)"
+                value={updatedExercise.recovery}
+                keyboardType="numeric"
+                onChangeText={text => setUpdatedExercise({ ...updatedExercise, recovery: text })}
+              />
+
+              <Button title="Salva" onPress={handleSave} />
+              <Button title="Annulla" onPress={() => setIsModalVisible(false)} />
+            </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -185,18 +248,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     borderTopRightRadius: 30,
-    borderTopLeftRadius: 30
+    borderTopLeftRadius: 30,
   },
   content: {
     backgroundColor: '#fff',
-    padding: 20,
+    padding: 10,
     width: '95%',
-    top: 10
+    top: 10,
+    height: 610
   },
   noExercisesText: {
-    fontSize: 18,
+    fontSize: 25,
+    fontWeight: '400',
     textAlign: 'center',
-    marginBottom: 20,
   },
   exerciseItem: {
     backgroundColor: '#f0f0f0',
@@ -235,7 +299,8 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
+    textAlign: 'center'
   },
   input: {
     borderColor: '#ccc',

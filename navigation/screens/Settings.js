@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Alert, FlatList } from 'react-native';
+import { View, Text, Button, Alert, FlatList, StyleSheet, TextBase } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const Settings = () => {
   const [exercises, setExercises] = useState([]); // Stato per gli esercizi esistenti
   const navigation = useNavigation();
+
+  // Definisci l'ordine dei giorni della settimana
+  const daysOrder = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
   // Carica gli esercizi salvati all'avvio del componente
   useEffect(() => {
@@ -53,20 +56,28 @@ const Settings = () => {
     );
   };
 
+  // Funzione per ordinare i giorni selezionati secondo daysOrder
+  const sortDays = (days) => {
+    return days.slice().sort((a, b) => daysOrder.indexOf(a) - daysOrder.indexOf(b));
+  };
+
   // Funzione per renderizzare ogni esercizio nella lista
-  const renderExercise = ({ item }) => (
-    <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ddd' }}>
-      <Text>{item.name}</Text>
-      {/* Assicurati di avvolgere il rendering dei giorni in un componente Text */}
-      <Text>Giorni: {item.selectedDays ? item.selectedDays.join(', ') : 'Nessun giorno selezionato'}</Text>
-    </View>
-  );
+  const renderExercise = ({ item }) => {
+    const sortedDays = item.selectedDays ? sortDays(item.selectedDays) : [];
+    return (
+      <View style={styles.exerciseItem}>
+        <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={styles.exerciseName}>{item.name}</Text>
+          <Text style={{fontSize: 18}}>Giorni: <Text style={{fontWeight: 'bold'}}>{sortedDays.length > 0 ? sortedDays.join(', ') : 'Nessun giorno selezionato'}</Text></Text>
+        </View>
+      </View>
+    );
+  };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff' }}>
-      <View style={{ backgroundColor: '#fff', padding: 20, width: '100%' }}>
-        <Text style={{ fontSize: 18, marginBottom: 10 }}>Esercizi:</Text>
-
+    <View style={{ flex: 1, justifyContent: 'center', padding: 10, backgroundColor: 'black'}}>
+      <Text style={{ fontSize: 30, fontWeight: '300', marginBottom: 10, textAlign: 'center', color:'#edd136', top: 20 }}>Riepilogo Scheda:</Text>
+      <View style={{ backgroundColor: '#f0f0f0', padding: 20, width: '100%', height: '85%',borderWidth: 2, borderColor: '#edd136', borderRadius: 9, top: 20}}>
         {/* Lista di tutti gli esercizi */}
         <FlatList
           data={exercises}
@@ -86,5 +97,18 @@ const Settings = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  exerciseItem: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  exerciseName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+})
 
 export default Settings;

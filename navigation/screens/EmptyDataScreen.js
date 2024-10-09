@@ -45,14 +45,14 @@ const EmptyDataScreen = ({ navigation }) => {
       Toast.show({
         type: 'error',
         text1: 'Attenzione!',
-        text2: 'Non hai inserito un esercizio valido o il recupero.'
+        text2: 'Non hai compilato tutti i campi.'
       });
       Vibration.vibrate();
     }
   };
 
   const handleInfo = () => {
-    Alert.alert("Serie e Peso", "Gli esercizi con modalità 'PIRAMIDALE' o 'DROPSET' possono essere impostati in seguito.");
+    Alert.alert("Serie e Peso", "Gli esercizi con modalità 'PIRAMIDALE' possono essere impostati in seguito. Inserisci un peso 'base' se necessiti una modifica di fino.");
   }
 
   const handleSaveData = async () => {
@@ -251,12 +251,12 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     width: 350,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 9,
   },
   inputBoxII:{
     borderWidth: 2,
     padding: 5,
-    borderRadius: 20,
+    borderRadius: 9,
     borderColor: '#000',
     width: 156
   },

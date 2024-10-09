@@ -9,7 +9,7 @@ import {
   Platform
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { Audio } from 'expo-av'; // Importa Audio da expo-av
+import { Audio } from 'expo-av';
 
 const screen = Dimensions.get("window");
 
@@ -39,15 +39,18 @@ export default class App extends Component {
     remainingSeconds: 5,
     isRunning: false,
     selectedMinutes: "1",
-    selectedSeconds: "0"
+    selectedSeconds: "0",
+    mode: "timer", // Stato per gestire modalità (timer o cronometro)
+    elapsedSeconds: 0 // Stato per il cronometro
   };
 
   interval = null;
-  sound = null;  // Variabile per memorizzare il suono
+  sound = null;
 
   componentDidUpdate = (prevProp, prevState) => {
-    if (this.state.remainingSeconds === 0 && prevState.remainingSeconds !== 0) {
-      this.playSound();  // Riproduci il suono quando il timer arriva a 0
+    const { remainingSeconds, mode } = this.state;
+    if (mode === "timer" && remainingSeconds === 0 && prevState.remainingSeconds !== 0) {
+      this.playSound();
       this.stop();
     }
   };
@@ -61,36 +64,52 @@ export default class App extends Component {
   playSound = async () => {
     try {
       const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/sounds/alarm.mp3')  // Specifica il tuo file audio
+        require('../../assets/sounds/alarm.mp3')
       );
       this.sound = sound;
-      await sound.playAsync();  // Riproduci il suono
+      await sound.playAsync();
     } catch (error) {
       console.log('Errore nella riproduzione del suono:', error);
     }
   };
 
   start = () => {
-    this.setState(state => ({
-      remainingSeconds:
-        parseInt(state.selectedMinutes, 10) * 60 +
-        parseInt(state.selectedSeconds, 10),
-      isRunning: true
-    }));
-    this.interval = setInterval(() => {
-      this.setState(state => ({
-        remainingSeconds: state.remainingSeconds - 1
-      }));
-    }, 1000);
+    const { mode, selectedMinutes, selectedSeconds } = this.state;
+    if (mode === "timer") {
+      this.setState({
+        remainingSeconds:
+          parseInt(selectedMinutes, 10) * 60 +
+          parseInt(selectedSeconds, 10),
+        isRunning: true
+      });
+      this.interval = setInterval(() => {
+        this.setState(state => ({
+          remainingSeconds: state.remainingSeconds - 1
+        }));
+      }, 1000);
+    } else if (mode === "stopwatch") {
+      this.setState({ isRunning: true, elapsedSeconds: 0 });
+      this.interval = setInterval(() => {
+        this.setState(state => ({
+          elapsedSeconds: state.elapsedSeconds + 1
+        }));
+      }, 1000);
+    }
   };
 
   stop = () => {
     clearInterval(this.interval);
     this.interval = null;
     this.setState({
+      isRunning: false,
       remainingSeconds: 5,
-      isRunning: false
+      elapsedSeconds: 0 // Resetta anche per il cronometro
     });
+  };
+
+  switchMode = () => {
+    const { mode } = this.state;
+    this.setState({ mode: mode === "timer" ? "stopwatch" : "timer" });
   };
 
   renderPickers = () => (
@@ -128,15 +147,31 @@ export default class App extends Component {
 
   render() {
     const { minutes, seconds } = getRemaining(this.state.remainingSeconds);
+    const { elapsedSeconds, mode, isRunning } = this.state;
+    const elapsedTime = getRemaining(elapsedSeconds);
+
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
-        {this.state.isRunning ? (
-          <Text style={styles.timerText}>{`${minutes}:${seconds}`}</Text>
-        ) : (
+        <TouchableOpacity onPress={this.switchMode} style={styles.switchButton}>
+          <Text style={styles.switchButtonText}>
+            {mode === "timer" ? "Passa al Cronometro" : "Passa al Timer"}
+          </Text>
+        </TouchableOpacity>
+
+        {isRunning ? (
+          mode === "timer" ? (
+            <Text style={styles.timerText}>{`${minutes}:${seconds}`}</Text>
+          ) : (
+            <Text style={styles.timerText}>{`${elapsedTime.minutes}:${elapsedTime.seconds}`}</Text>
+          )
+        ) : mode === "timer" ? (
           this.renderPickers()
+        ) : (
+          <Text style={styles.timerText}>{`${elapsedTime.minutes}:${elapsedTime.seconds}`}</Text>
         )}
-        {this.state.isRunning ? (
+
+        {isRunning ? (
           <TouchableOpacity
             onPress={this.stop}
             style={[styles.button, styles.buttonStop]}
@@ -207,5 +242,15 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: "row",
     alignItems: "center"
+  },
+  switchButton: {
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: "#edd136",
+    borderRadius: 5
+  },
+  switchButtonText: {
+    color: "#09090b",
+    fontSize: 20
   }
 });
