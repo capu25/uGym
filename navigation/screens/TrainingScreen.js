@@ -144,7 +144,7 @@ const TrainingScreen = () => {
                 source={require('../../assets/lottie/animation.json')}
                 autoPlay
                 loop
-                style={{width:'100%', height:'100%', bottom: 180}}
+                style={{width:'100%', height:'100%', bottom: 100}}
               />
             </View>
           )}

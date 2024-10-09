@@ -83,7 +83,11 @@ const Settings = () => {
           data={exercises}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderExercise}
-          ListEmptyComponent={<Text>Nessun esercizio disponibile.</Text>} // Componente vuoto da visualizzare quando non ci sono esercizi
+          ListEmptyComponent={<View style={{alignItems: 'center', marginTop: '60%'}}>
+                                <Text style={{fontSize: 25, textAlign: 'center', marginBottom: 20}}>OOPS... qualcosa non va!</Text>
+                                <Text style={{fontSize: 25, textAlign: 'center'}}>Nessun esercizio disponibile.</Text>
+                                <Text style={{fontSize: 18, textAlign: 'center', marginTop: 20}}>Per inserire nuovi esercizi, premi <Text style={{color:'red'}}>"ELIMINA TUTTI I DATI"</Text> e segui la procedura indicata.</Text>
+                              </View>} // Componente vuoto da visualizzare quando non ci sono esercizi
         />
 
         {/* Pulsante per eliminare tutti i dati */}
