@@ -68,7 +68,7 @@ const Settings = () => {
       <View style={styles.exerciseItem}>
         <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text style={styles.exerciseName}>{item.name}</Text>
-          <Text style={{fontSize: 18}}>Giorni: <Text style={{fontWeight: 'bold'}}>{sortedDays.length > 0 ? sortedDays.join(', ') : 'Nessun giorno selezionato'}</Text></Text>
+          <Text style={{fontSize: 18, fontWeight: '200'}}>Giorni: <Text style={{fontWeight: 'bold'}}>{sortedDays.length > 0 ? sortedDays.join(', ') : 'Nessun giorno selezionato'}</Text></Text>
         </View>
       </View>
     );
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
   exerciseName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
 })
 
