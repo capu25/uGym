@@ -5,7 +5,7 @@ import { AntDesign } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import Counter from 'react-native-counters';
 
-const EmptyDataScreen = ({ navigation }) => {
+const AddDataScreen = ({ navigation }) => {
 
   const screenWidth = Dimensions.get('window').width;
 
@@ -15,7 +15,6 @@ const EmptyDataScreen = ({ navigation }) => {
   const [reps, setReps] = useState(0);       // Numero di ripetizioni per serie
   const [weight, setWeight] = useState(0);   // Peso in KG
   const [recovery, setRecovery] = useState(0); // Recupero in secondi
-  const [exercises, setExercises] = useState([]);
 
   const days = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
 
@@ -28,21 +27,46 @@ const EmptyDataScreen = ({ navigation }) => {
   };
 
   const handleAddExercise = async () => {
-    if (name.trim() && recovery > 0 && reps > 0  && series > 0 && selectedDays.length > 0) { 
-      const newExercise = { name, selectedDays, series, reps, weight, recovery }; 
-      setExercises([...exercises, newExercise]);
-      await AsyncStorage.setItem('exercises', JSON.stringify([...exercises, newExercise]));
-      setName('');
-      setSelectedDays([]);
-      //setSeries(0);
-      //setReps(0);
-      //setWeight(0);
-      //setRecovery(0);
-      Toast.show({
-        type: 'success',
-        text1: 'Ben fatto!',
-        text2: 'Esercizio aggiunto con successo 💪'
-      });
+    if (name.trim() && recovery > 0 && reps > 0 && series > 0 && selectedDays.length > 0) {
+      try {
+        // Recupera gli esercizi esistenti
+        const storedExercises = await AsyncStorage.getItem('exercises');
+        const parsedExercises = storedExercises ? JSON.parse(storedExercises) : [];
+
+        // Crea il nuovo esercizio
+        const newExercise = { name, selectedDays, series, reps, weight, recovery };
+
+        // Aggiungi il nuovo esercizio a quelli esistenti
+        const updatedExercises = [...parsedExercises, newExercise];
+
+        // Salva l'array aggiornato in AsyncStorage
+        await AsyncStorage.setItem('exercises', JSON.stringify(updatedExercises));
+
+        // Resetta i campi
+        setName('');
+        setSelectedDays([]);
+        setSeries(0);
+        setReps(0);
+        setWeight(0);
+        setRecovery(0);
+
+        // Mostra il toast di successo
+        Toast.show({
+          type: 'success',
+          text1: 'Ben fatto!',
+          text2: 'Esercizio aggiunto con successo 💪'
+        });
+
+        // Naviga indietro
+        navigation.goBack();  // Torna alla schermata precedente
+      } catch (error) {
+        console.log('Errore nel salvataggio', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Errore',
+          text2: 'Si è verificato un errore durante il salvataggio.'
+        });
+      }
     } else {
       Toast.show({
         type: 'error',
@@ -56,21 +80,6 @@ const EmptyDataScreen = ({ navigation }) => {
   const handleInfo = () => { 
     Alert.alert("Serie, Ripetizioni e Peso", "I valori inseriti sono modificabili nella pagina seguente per gli allenamenti 'Piramidali' o 'Dropset'");
   }
-
-  const handleSaveData = async () => {
-    if (exercises.length > 0) {
-      await AsyncStorage.setItem('exercises', JSON.stringify(exercises));
-      await AsyncStorage.setItem('hasCompletedData', 'true');
-      navigation.replace('MainTabs');
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Attenzione!',
-        text2: 'Non hai aggiunto nessun esercizio.'
-      });
-      Vibration.vibrate();
-    }
-  };
 
   const DayButton = ({ day, isSelected, onPress }) => {
     return (
@@ -86,15 +95,8 @@ const EmptyDataScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        <View style={styles.logo}>
-          <Image
-            source={require('../../assets/ugymLogo.png')}
-            style={styles.image}
-            resizeMode="contain"
-          />
-        </View>
         <View style={[styles.whiteContainer, { width: screenWidth }]}>
-          <Text style={styles.headerText}>Inserisci gli esercizi presenti nella scheda!</Text>
+          <Text style={styles.headerText}>Aggiungi esercizio alla scheda corrente</Text>
           <TextInput
             value={name}
             onChangeText={setName}
@@ -239,20 +241,14 @@ const EmptyDataScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.finishedButton} onPress={handleSaveData}>
-              <Text style={styles.finishedButtonText}>Ho finito!</Text>
+            <TouchableOpacity style={styles.addButton} onPress={handleAddExercise}>
+              <AntDesign name="plus" size={24} color="white" />
             </TouchableOpacity>
-
-            <View style={styles.addButtonContainer}>
-              <TouchableOpacity style={styles.addButton} onPress={handleAddExercise}>
-                <AntDesign name="plus" size={24} color="white" />
-              </TouchableOpacity>
-            </View>
           </View>
 
         </View>
 
-        <Toast text1Style={{ fontSize: 15 }} text2Style={{ fontSize: 15 }} />
+        <Toast text1="Success!" />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -359,8 +355,8 @@ const styles = StyleSheet.create({
   // AGGIUNGI CURVO SU + 
   addText:{
     alignSelf: 'flex-end',
-    left: 5,
-    bottom: 30
+    right: 133,
+    bottom: 10
   },
   // BOTTONI A FINE PAGINA
   buttonContainer: {
@@ -368,7 +364,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    bottom: 50,
+    bottom: 30,
   },
   finishedButton: {
     backgroundColor: '#fff',
@@ -410,4 +406,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmptyDataScreen;
+export default AddDataScreen;

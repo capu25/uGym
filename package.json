@@ -25,7 +25,9 @@
     "react-native-counters": "^1.3.0",
     "react-native-flip-countdown-timer": "^0.0.3",
     "react-native-sound": "^0.11.2",
-    "react-native-toast-message": "^2.2.1"
+    "react-native-toast-message": "^2.2.1",
+    "expo-dev-client": "~4.0.28",
+    "expo-updates": "~0.25.27"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

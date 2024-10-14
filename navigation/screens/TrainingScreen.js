@@ -217,6 +217,7 @@ const TrainingScreen = () => {
                     key={index}
                     style={styles.input}
                     placeholder={`Ripetizione ${index + 1}`}
+                    placeholderTextColor="#000"
                     value={rep}
                     keyboardType="numeric"
                     onChangeText={text => {
@@ -230,6 +231,7 @@ const TrainingScreen = () => {
                 <TextInput
                   style={styles.input}
                   placeholder="Ripetizioni"
+                  placeholderTextColor="#000"
                   value={updatedExercise.reps[0]}
                   keyboardType="numeric"
                   onChangeText={text => setUpdatedExercise({ ...updatedExercise, reps: [text] })}
@@ -251,7 +253,7 @@ const TrainingScreen = () => {
                   onValueChange={value => setUpdatedExercise({ ...updatedExercise, useMultipleWeights: value })}
                 />
                 <Text style={{ left: 5, fontSize: 15, fontWeight: '200' }}>
-                  {updatedExercise.useMultipleWeights ? 'Usa più pesi' : 'Usa peso singolo'}
+                  {updatedExercise.useMultipleWeights ? 'Usa più pesi' : 'Usa più pesi'}
                 </Text>
               </View>
 
@@ -262,6 +264,7 @@ const TrainingScreen = () => {
                     key={index}
                     style={styles.input}
                     placeholder={`Peso ${index + 1} (kg)`}
+                    placeholderTextColor="#000"
                     value={weight}
                     keyboardType="numeric"
                     onChangeText={text => {
@@ -275,6 +278,7 @@ const TrainingScreen = () => {
                 <TextInput
                   style={styles.input}
                   placeholder="Peso (kg)"
+                  placeholderTextColor="#000"
                   value={updatedExercise.weight}
                   keyboardType="numeric"
                   onChangeText={text => setUpdatedExercise({ ...updatedExercise, weight: text })}
@@ -291,6 +295,7 @@ const TrainingScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Recupero (sec)"
+                placeholderTextColor="#000"
                 value={updatedExercise.recovery}
                 keyboardType="numeric"
                 onChangeText={text => setUpdatedExercise({ ...updatedExercise, recovery: text })}
@@ -387,6 +392,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    placeholderTextColor: '#000'
   },
 });
 

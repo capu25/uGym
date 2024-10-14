@@ -11,6 +11,7 @@ import TrainingScreen from './screens/TrainingScreen';
 import Settings from './screens/Settings';
 import OnboardingScreen from './screens/OnboardingScreen';
 import TimerScreen from './screens/TimerScreen';
+import AddDataScreen from './screens/AddDataScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -105,8 +106,9 @@ const MainContainer = () => {
         screenOptions={{ headerShown: false }}
       >
         {/*<Stack.Screen name="Onboarding" component={OnboardingScreen} />*/}
-        <Stack.Screen name="EmptyData" component={EmptyDataScreen} />
-        <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+        <Stack.Screen name="EmptyData" component={EmptyDataScreen} options={{gestureEnabled: false}}/>
+        <Stack.Screen name="MainTabs" component={MainTabNavigator} options={{gestureEnabled: false}}/>
+        <Stack.Screen name="AddExercise" component={AddDataScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
