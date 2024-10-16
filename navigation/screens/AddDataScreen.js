@@ -12,7 +12,7 @@ const AddDataScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
   const [series, setSeries] = useState(0);   // Numero di serie
-  const [reps, setReps] = useState(0);       // Numero di ripetizioni per serie
+  const [reps, setReps] = useState([]);       // Numero di ripetizioni per serie
   const [weight, setWeight] = useState(0);   // Peso in KG
   const [recovery, setRecovery] = useState(0); // Recupero in secondi
 
@@ -27,7 +27,7 @@ const AddDataScreen = ({ navigation }) => {
   };
 
   const handleAddExercise = async () => {
-    if (name.trim() && recovery > 0 && reps > 0 && series > 0 && selectedDays.length > 0) {
+    if (name.trim() && recovery > 0 && reps.length > 0 && series > 0 && selectedDays.length > 0) {
       try {
         // Recupera gli esercizi esistenti
         const storedExercises = await AsyncStorage.getItem('exercises');
@@ -46,7 +46,7 @@ const AddDataScreen = ({ navigation }) => {
         setName('');
         setSelectedDays([]);
         setSeries(0);
-        setReps(0);
+        setReps([]);
         setWeight(0);
         setRecovery(0);
 
@@ -168,7 +168,7 @@ const AddDataScreen = ({ navigation }) => {
             <Counter
               start={weight}
               max={200}
-              increment={5}
+              increment={1}
               onChange={(count) => setWeight(count)} // Peso in KG
               buttonStyle={{
                 borderColor: '#333',

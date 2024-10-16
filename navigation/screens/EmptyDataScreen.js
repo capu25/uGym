@@ -12,7 +12,7 @@ const EmptyDataScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
   const [series, setSeries] = useState(0);   // Numero di serie
-  const [reps, setReps] = useState(0);       // Numero di ripetizioni per serie
+  const [reps, setReps] = useState([]);       // Numero di ripetizioni per serie
   const [weight, setWeight] = useState(0);   // Peso in KG
   const [recovery, setRecovery] = useState(0); // Recupero in secondi
   const [exercises, setExercises] = useState([]);
@@ -28,16 +28,17 @@ const EmptyDataScreen = ({ navigation }) => {
   };
 
   const handleAddExercise = async () => {
-    if (name.trim() && recovery > 0 && reps > 0  && series > 0 && selectedDays.length > 0) { 
+    if (name.trim() && recovery > 0 && reps.length > 0  && series > 0 && selectedDays.length > 0) { 
       const newExercise = { name, selectedDays, series, reps, weight, recovery }; 
       setExercises([...exercises, newExercise]);
       await AsyncStorage.setItem('exercises', JSON.stringify([...exercises, newExercise]));
       setName('');
       setSelectedDays([]);
-      //setSeries(0);
-      //setReps(0);
-      //setWeight(0);
-      //setRecovery(0);
+      setSeries(0);
+      setReps([]);
+      setWeight(0);
+      setRecovery(0);
+      
       Toast.show({
         type: 'success',
         text1: 'Ben fatto!',
@@ -166,7 +167,7 @@ const EmptyDataScreen = ({ navigation }) => {
             <Counter
               start={weight}
               max={200}
-              increment={5}
+              increment={1}
               onChange={(count) => setWeight(count)} // Peso in KG
               buttonStyle={{
                 borderColor: '#333',

@@ -9,14 +9,6 @@ const TrainingScreen = () => {
   const [exercises, setExercises] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
-  //const [updatedExercise, setUpdatedExercise] = useState({ 
-  //  name: '', 
-  //  series: '', 
-  //  weight: '', 
-  //  weights: [''], // Lista di pesi multipli
- //   recovery: '', 
- //   useMultipleWeights: false // Switch per pesi multipli
- // });
 
   const [updatedExercise, setUpdatedExercise] = useState({
     name: '',
@@ -111,19 +103,23 @@ const TrainingScreen = () => {
   const renderExercise = ({ item }) => (
     <View style={styles.exerciseItem}>
       <Text style={styles.exerciseName}>{item.name}</Text>
+      
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', marginTop: 5, padding: 10 }}>
+        
+        {/* Serie e Ripetizioni */}
         <View>
           <Text style={{ fontSize: 18, fontWeight: '500' }}>Serie: {item.series}</Text>
-  
+          
           {/* Gestione delle ripetizioni */}
           {item.useMultipleReps ? (
             <Text style={{ fontSize: 18, fontWeight: '300', marginTop: 10 }}>
               Ripetizioni: {item.reps.join(', ')}
             </Text>
           ) : (
-            <Text style={{ fontSize: 18, fontWeight: '300', marginTop: 10 }}>Ripetizioni: {item.reps[0]}</Text>
+            <Text style={{ fontSize: 18, fontWeight: '300', marginTop: 10 }}>Ripetizioni: {item.reps[0]}</Text> 
+            // Qui usi il primo elemento dell'array
           )}
-  
+          
           {/* Gestione dei pesi */}
           {item.useMultipleWeights ? (
             <View style={{ marginTop: 10 }}>
@@ -137,13 +133,18 @@ const TrainingScreen = () => {
             <Text style={{ fontSize: 18, fontWeight: '300', marginTop: 10 }}>Peso: {item.weight} Kg</Text>
           )}
         </View>
+  
+        {/* Recupero */}
         <Text style={{ fontSize: 18, fontWeight: '500' }}>Recupero: {item.recovery}''</Text>
       </View>
+  
+      {/* Pulsante Modifica */}
       <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
         <Text style={styles.editButtonText}>Modifica</Text>
       </TouchableOpacity>
     </View>
-  );  
+  );
+   
 
   return (
     <View style={styles.container}>
