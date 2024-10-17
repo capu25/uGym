@@ -26,7 +26,7 @@ Don't forget to check this page for the newest update!
 ## Screenshots
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/373cb2d1-5eda-47f2-88d9-0f2898c92a51" width="200" margin-left="200px"/>
+  <img src="https://github.com/user-attachments/assets/373cb2d1-5eda-47f2-88d9-0f2898c92a51" width="200"/>
   <img src="https://github.com/user-attachments/assets/2d54777f-4303-4811-90ee-e26c9e541f41" width="200"/>
   <img src="https://github.com/user-attachments/assets/6d6c3791-676c-4941-8455-2b88df644206" width="200"/>
   <img src="https://github.com/user-attachments/assets/070b77e6-feae-4d8d-8d60-aa344ac8caac" width="200"/>
