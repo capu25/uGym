@@ -27,12 +27,11 @@ Don't forget to check this page for the newest update!
 
 ![1](https://github.com/user-attachments/assets/373cb2d1-5eda-47f2-88d9-0f2898c92a51)
 
-![2](https://github.com/user-attachments/assets/0df69d91-e9d8-461c-9671-e07bca530abf)
+![2S](https://github.com/user-attachments/assets/2d54777f-4303-4811-90ee-e26c9e541f41)
 
-![5](https://github.com/user-attachments/assets/3a03a32d-edda-4b41-b88d-801d42011ab2)
+![3S](https://github.com/user-attachments/assets/6d6c3791-676c-4941-8455-2b88df644206)
 
-![6](https://github.com/user-attachments/assets/8deb5e4e-2e68-41ad-abe0-1d9882badfc6)
-
+![4S](https://github.com/user-attachments/assets/070b77e6-feae-4d8d-8d60-aa344ac8caac)
 
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
