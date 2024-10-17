@@ -130,10 +130,14 @@ const EmptyDataScreen = ({ navigation }) => {
             />
             {/* Contatore per le ripetizioni */}
             <Counter
-              start={reps}
+              start={reps[0] || 0} // Mostra il valore di reps[0] (ripetizioni della prima serie), o 0 se non è definito
               max={50}
               increment={2}
-              onChange={(count) => setReps(count)} // Contatore per ripetizioni
+              onChange={(count) => {
+                const updatedReps = [...reps];  // Copia dell'array
+                updatedReps[0] = count;         // Aggiorna solo il primo elemento dell'array
+                setReps(updatedReps);           // Salva l'array aggiornato
+              }}
               buttonStyle={{
                 borderColor: '#333',
                 borderWidth: 2,
