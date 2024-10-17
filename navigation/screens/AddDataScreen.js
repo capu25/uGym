@@ -131,10 +131,14 @@ const AddDataScreen = ({ navigation }) => {
             />
             {/* Contatore per le ripetizioni */}
             <Counter
-              start={reps}
+              start={reps[0] || 0} // Mostra il valore di reps[0] (ripetizioni della prima serie), o 0 se non è definito
               max={50}
               increment={2}
-              onChange={(count) => setReps(count)} // Contatore per ripetizioni
+              onChange={(count) => {
+                const updatedReps = [...reps];  // Copia dell'array
+                updatedReps[0] = count;         // Aggiorna solo il primo elemento dell'array
+                setReps(updatedReps);           // Salva l'array aggiornato
+              }}
               buttonStyle={{
                 borderColor: '#333',
                 borderWidth: 2,
@@ -153,6 +157,7 @@ const AddDataScreen = ({ navigation }) => {
                 fontWeight: 'bold'
               }}
             />
+
           </View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-around', bottom: 20, width: 280, left: 10 }}>
@@ -407,4 +412,3 @@ const styles = StyleSheet.create({
 });
 
 export default AddDataScreen;
-//test
