@@ -19,7 +19,7 @@ You have two options:
 
 Once this procedure is completed, you only need to launch Expo-Go to load the app, and then click on "uGym".
 
-Don't forget to check this page for the newest update!
+Don't forget to check this page for the newest update! [LAST UPDATE 30/10]
 
 
 
