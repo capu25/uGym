@@ -19,6 +19,10 @@ const EmptyDataScreen = ({ navigation }) => {
 
   const days = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
 
+  const handleRepsChange = (count) => {
+    setReps([count]); // Memorizza il valore come primo elemento dell'array
+  };
+
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
       setSelectedDays(selectedDays.filter(d => d !== day));
@@ -28,22 +32,41 @@ const EmptyDataScreen = ({ navigation }) => {
   };
 
   const handleAddExercise = async () => {
-    if (name.trim() && recovery > 0 && reps.length > 0  && series > 0 && selectedDays.length > 0) { 
-      const newExercise = { name, selectedDays, series, reps, weight, recovery }; 
-      setExercises([...exercises, newExercise]);
-      await AsyncStorage.setItem('exercises', JSON.stringify([...exercises, newExercise]));
-      setName('');
-      setSelectedDays([]);
-      setSeries(0);
-      setReps([]);
-      setWeight(0);
-      setRecovery(0);
-      
-      Toast.show({
-        type: 'success',
-        text1: 'Ben fatto!',
-        text2: 'Esercizio aggiunto con successo 💪'
-      });
+    // Modifica la validazione per controllare il primo valore dell'array reps
+    if (name.trim() && recovery > 0 && reps.length > 0 && reps[0] > 0 && series > 0 && selectedDays.length > 0) {
+      try {
+        const storedExercises = await AsyncStorage.getItem('exercises');
+        const parsedExercises = storedExercises ? JSON.parse(storedExercises) : [];
+
+        // Crea il nuovo esercizio mantenendo reps come array
+        const newExercise = { name, selectedDays, series, reps, weight, recovery };
+
+        const updatedExercises = [...parsedExercises, newExercise];
+        await AsyncStorage.setItem('exercises', JSON.stringify(updatedExercises));
+
+        // Resetta i campi
+        setName('');
+        setSelectedDays([]);
+        setSeries(0);
+        setReps([]); // Resetta l'array delle ripetizioni
+        setWeight(0);
+        setRecovery(0);
+
+        Toast.show({
+          type: 'success',
+          text1: 'Ben fatto!',
+          text2: 'Esercizio aggiunto con successo 💪'
+        });
+
+        navigation.goBack();
+      } catch (error) {
+        console.log('Errore nel salvataggio', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Errore',
+          text2: 'Si è verificato un errore durante il salvataggio.'
+        });
+      }
     } else {
       Toast.show({
         type: 'error',
@@ -128,12 +151,12 @@ const EmptyDataScreen = ({ navigation }) => {
                 fontWeight: 'bold'
               }}
             />
-            {/* Contatore per le ripetizioni */}
-            <Counter
-              start={reps}
+             {/* Contatore per le ripetizioni - modificato per gestire il primo valore dell'array */}
+             <Counter
+              start={reps[0] || 0} // Mostra il primo valore dell'array o 0 se vuoto
               max={50}
               increment={2}
-              onChange={(count) => setReps(count)} // Contatore per ripetizioni
+              onChange={handleRepsChange}
               buttonStyle={{
                 borderColor: '#333',
                 borderWidth: 2,
