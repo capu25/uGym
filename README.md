@@ -14,7 +14,7 @@ You have two options:
 ## Expo-Go procedure
 
 - Download on your device [Expo-Go](https://expo.dev/go) app.
-- Click [here](https://tinyurl.com/uGymUpdateLast) to open uGym on your browser.
+- Click [here](https://tinyurl.com/uGymRel2) to open uGym on your browser.
 - Then click on "open" to have the app automatically on your phone!
 
 Once this procedure is completed, you only need to launch Expo-Go to load the app, and then click on "uGym".
