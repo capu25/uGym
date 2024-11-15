@@ -13,14 +13,16 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ccaapp.uGym"
+      "bundleIdentifier": "com.ccaapp.uGym",
+      "newArchEnabled": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ccaapp.uGym"
+      "package": "com.ccaapp.uGym",
+      "newArchEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

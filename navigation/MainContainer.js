@@ -25,9 +25,8 @@ const MainTabNavigator = () => {
         tabBarActiveTintColor: '#edd136',
         tabBarInactiveTintColor: '#a6a6a6',
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           textAlign: 'center',
-          bottom: 5
         },
         tabBarStyle : {
           backgroundColor: "#09090b",
@@ -44,7 +43,7 @@ const MainTabNavigator = () => {
         component={TrainingScreen} 
         options={{
           tabBarIcon: ({ color }) => (
-            <Icon name="user-circle-o" size={30} color={color} style={{}}/>
+            <Icon name="user-circle-o" size={28} color={color} style={{}}/>
           ),
         }} 
       />
@@ -53,7 +52,7 @@ const MainTabNavigator = () => {
         component={TimerScreen} 
         options={{
           tabBarIcon: ({ color }) => (
-            <Icon name="clock-o" size={33} color={color} style={{}}/> //clock-o
+            <Icon name="clock-o" size={30} color={color} style={{}}/> //clock-o
           ),
         }} 
       />
@@ -62,7 +61,7 @@ const MainTabNavigator = () => {
         component={Settings} 
         options={{
           tabBarIcon: ({ color }) => (
-            <Icon name="cog" size={30} color={color} style={{}}/>
+            <Icon name="cog" size={29} color={color} style={{}}/>
           ),
         }} 
       />
